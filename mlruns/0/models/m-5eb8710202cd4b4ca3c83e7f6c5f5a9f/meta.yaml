@@ -1,0 +1,10 @@
+artifact_location: file:///home/megagdev/megagdev/study/MLOPS/NetworkSecurity/mlruns/0/models/m-5eb8710202cd4b4ca3c83e7f6c5f5a9f/artifacts
+creation_timestamp: 1752943035158
+experiment_id: '0'
+last_updated_timestamp: 1752943036492
+model_id: m-5eb8710202cd4b4ca3c83e7f6c5f5a9f
+model_type: null
+name: model
+source_run_id: 58c4617f5fba4447b5fdb0f8cacab6ac
+status: 2
+status_message: null
