@@ -71,28 +71,48 @@ jobs:
     needs: build-and-push-ecr-image
     runs-on: self-hosted
     steps:
+        # Get the code
         - name: Checkout
           uses: actions/checkout@v3
 
+        # set up AWS creds
         - name: Configure AWS credentials
           uses: aws-actions/configure-aws-credentials@v2
           with:
             aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
             aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
             aws-region: ${{ secrets.AWS_REGION }}
-
+        
+        # Log in to ECR
         - name: Login to Amazon ECR
           id: login-ecr
           uses: aws-actions/amazon-ecr-login@v2
 
+        # Tear down any old container
+        - name: Stop & remove old container
+          run: |
+            if docker ps -a --format '{{.Names}}' | grep -xq 'networksecurity'; then
+              docker rm -f networksecurity
+            fi
+
+        # Grab the image I just built
         - name: Pull latest images
           run: |
             docker pull ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY_NAME }}:latest
 
+        # Lunch it
         - name: Run Docker Image to serve users
           run: |
-            docker run -d -p 8080:8080 --ipc="host" --name=networksecurity -e 'AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}' -e 'AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}' -e 'AWS_REGION=${{ secrets.AWS_REGION }}' ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY_NAME }}:latest
+            docker run -d \
+            --name networksecurity \
+            -p 8080:8000 \
+            --ipc host \
+            -e AWS_ACCESS_KEY_ID="${{ secrets.AWS_ACCESS_KEY_ID }}" \
+            -e AWS_SECRET_ACCESS_KEY="${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
+            -e AWS_REGION="${{ secrets.AWS_REGION }}" \
+            "${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY_NAME }}:latest"
         
+        # Housekeeping
         - name: Clean previous images and containers
           run: |
             docker system prune -f
