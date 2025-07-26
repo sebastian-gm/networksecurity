@@ -68,6 +68,7 @@ jobs:
             echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
   Continuos-Deployment:
+    name: Continuous Deployment
     needs: build-and-push-ecr-image
     runs-on: self-hosted
     steps:
@@ -75,7 +76,7 @@ jobs:
         - name: Checkout
           uses: actions/checkout@v3
 
-        # set up AWS creds
+        # set up AWS credentials
         - name: Configure AWS credentials
           uses: aws-actions/configure-aws-credentials@v2
           with:
@@ -88,7 +89,19 @@ jobs:
           id: login-ecr
           uses: aws-actions/amazon-ecr-login@v2
 
-        # Tear down any old container
+        # Free up disk space on the runner
+        - name: Cleanup disk space
+          run: |
+            # remove all stopped containers
+            docker rm -f $(docker ps -a -q)       || true
+            # remove all unused images, build cache and volumes
+            docker system prune -af               || true
+            docker builder prune -af              || true
+            docker volume prune -f                || true
+            # show free space for diagnostics
+            df -h
+
+        # Stop & remove any old container named "networsecurity"
         - name: Stop & remove old container
           run: |
             if docker ps -a --format '{{.Names}}' | grep -xq 'networksecurity'; then
@@ -100,7 +113,7 @@ jobs:
           run: |
             docker pull ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY_NAME }}:latest
 
-        # Lunch it
+        # Lunch the new container
         - name: Run Docker Image to serve users
           run: |
             docker run -d \
