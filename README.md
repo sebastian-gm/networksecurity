@@ -8,6 +8,72 @@ This project is a comprehensive phishing detection system that analyzes website 
 
 The application provides both training capabilities for the ML model and a prediction API for real-time phishing detection. It includes a complete MLOps pipeline with data validation, transformation, model training, and deployment capabilities.
 
+## Data Engineering Overview
+
+This project implements a comprehensive data engineering pipeline for phishing detection, encompassing the full data lifecycle from ingestion to production deployment. The system demonstrates enterprise-grade data engineering practices with robust error handling, validation, and scalability considerations.
+
+### Data Pipeline Architecture
+
+**Built and containerized an end-to-end ETL pipeline** that ingests phishing URL/domain data from MongoDB, validates schema compliance via YAML configuration, transforms features using KNN imputation, and prepares data for downstream ML model training.
+
+**Implemented data versioning and lineage tracking** using MLflow and DagsHub to ensure reproducibility of datasets, model inputs, and experiment tracking across the entire ML lifecycle.
+
+**Designed multi-layered storage architecture** with MongoDB for operational data, local file system for intermediate artifacts, and AWS S3 for model persistence and versioning, enabling reliable data access and backup strategies.
+
+### Data Quality & Validation
+
+**Built comprehensive data validation framework** with schema enforcement using YAML configuration files, detecting dataset drift using Kolmogorov-Smirnov tests, and implementing automated quality checks before data transformation.
+
+**Implemented data drift detection** with configurable thresholds (default 0.05 p-value) to identify distribution changes between training and test datasets, generating detailed drift reports for monitoring data quality over time.
+
+**Added validation logic** to catch schema drift and malformed inputs before they contaminate downstream models, with explicit error handling and logging for data quality issues.
+
+### Data Transformation & Feature Engineering
+
+**Developed automated feature preprocessing pipeline** using scikit-learn Pipeline with KNN imputation (n_neighbors=3) to handle missing values, ensuring data quality for downstream ML models.
+
+**Implemented target variable preprocessing** with automatic replacement of -1 values to 0 for binary classification, maintaining data consistency across training and inference pipelines.
+
+**Created modular transformation components** with pickle serialization for preprocessing objects, enabling consistent data transformation between training and production environments.
+
+### Infrastructure & Deployment
+
+**Automated deployment of data pipeline components** with Docker containerization and GitHub Actions CI/CD to AWS ECS, integrating cloud storage (S3) and secure secrets management for production scalability.
+
+**Implemented cloud-native data storage** with AWS S3 integration for artifact versioning, model persistence, and backup strategies, ensuring data durability and accessibility.
+
+**Built containerized data pipeline** with proper environment variable management, SSL certificate handling, and cross-origin resource sharing (CORS) configuration for web API deployment.
+
+### Observability & Monitoring
+
+**Implemented comprehensive logging system** with timestamped log files, structured logging format, and configurable log levels for pipeline monitoring and debugging.
+
+**Added experiment tracking** with MLflow integration for model performance metrics (F1-score, precision, recall), enabling model comparison and selection based on business metrics.
+
+**Created data pipeline observability** through artifact tracking, validation status reporting, and drift detection alerts for proactive data quality management.
+
+### Error Handling & Reliability
+
+**Built robust error handling framework** with custom exception classes, graceful failure recovery, and detailed error logging for all data pipeline components.
+
+**Implemented data pipeline reliability** with proper directory creation, file existence checks, and backup strategies to prevent data loss during processing.
+
+**Added validation status tracking** with explicit success/failure indicators and detailed error messages for troubleshooting pipeline issues.
+
+### Scalability & Performance
+
+**Designed scalable data architecture** with modular components, configurable parameters, and cloud-native storage for handling large-scale phishing datasets.
+
+**Implemented efficient data processing** with NumPy arrays for numerical operations, pandas for data manipulation, and optimized file I/O operations for performance.
+
+**Built production-ready data pipeline** with Docker containerization, environment variable management, and cloud deployment capabilities for enterprise scalability.
+
+### Data Security & Compliance
+
+**Implemented secure data handling** with environment variable management for sensitive credentials, SSL certificate validation for MongoDB connections, and secure file operations.
+
+**Added data privacy considerations** with proper credential management, secure API endpoints, and controlled access to sensitive phishing detection data.
+
 ## Tech Stack
 
 ### Core Technologies
@@ -273,7 +339,6 @@ networksecurity/
 - Application logs are available in the console output
 - MLflow tracking UI shows experiment metrics
 - Check Docker logs: `docker logs container_name`
-
 
 ## Contact
 
